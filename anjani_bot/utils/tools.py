@@ -20,6 +20,8 @@ from typing import Union
 from uuid import uuid4
 from re import compile as compilere
 
+from pyrogram.types import InlineKeyboardButton
+
 # Regex for button parser
 BTN_URL_REGEX = compilere(r"(\[([^\[]+?)\]\(buttonurl:(?:/{0,2})(.+?)(:same)?\))")
 
@@ -81,7 +83,25 @@ async def nekobin(client, data: str) -> str:
             return key
     return None
 
-async def parse_button(text):
+
+async def remove_escapes(text: str) -> str:
+    """Remove escaped in msg.text  """
+    counter = 0
+    res = ""
+    is_escaped = False
+    while counter < len(text):
+        if is_escaped:
+            res += text[counter]
+            is_escaped = False
+        elif text[counter] == "\\":
+            is_escaped = True
+        else:
+            res += text[counter]
+        counter += 1
+    return res
+
+
+async def md_parse_button(text):
     """ Parse button from matched msg.text. """
     markdown_parser = text
     prev = 0
@@ -111,6 +131,18 @@ async def parse_button(text):
     return parser_data, buttons
 
 
+async def build_keyboard(buttons):
+    """Build keyboards from provided buttons."""
+    keyb = []
+    for btn in buttons:
+        if btn[-1] and keyb:
+            keyb[-1].append(InlineKeyboardButton(btn[0], url=btn[1]))
+        else:
+            keyb.append([InlineKeyboardButton(btn[0], url=btn[1])])
+
+    return keyb
+
+
 def format_integer(number, thousand_separator="."):
     """ make an integer easy to read """
     def _reverse(string):
@@ -130,6 +162,11 @@ def format_integer(number, thousand_separator="."):
         else:
             result = char + result
     return result
+
+
+async def extrack_text(message):
+    """ extrack msg.text ["Caption", "Text", "None=Sticker"] """
+    return message.text or message.caption or (message.sticker.emoji if message.sticker else None)
 
 
 def rand_array(array: list):

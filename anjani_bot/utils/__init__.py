@@ -23,5 +23,9 @@ from .tools import (
     get_readable_time,
     nekobin,
     rand_array,
-    rand_key
+    rand_key,
+    md_parse_button,
+    extract_text,
+    build_keyboard,
+    remove_escapes,
 )
