@@ -18,7 +18,10 @@ import time
 from random import choice
 from typing import Union
 from uuid import uuid4
+from re import compile as compilere
 
+# Regex for button parser
+BTN_URL_REGEX = compilere(r"(\[([^\[]+?)\]\(buttonurl:(?:/{0,2})(.+?)(:same)?\))")
 
 def get_readable_time(seconds: int) -> str:
     """get human readable time from seconds."""
@@ -77,6 +80,35 @@ async def nekobin(client, data: str) -> str:
             key = response['result']['key']
             return key
     return None
+
+async def parse_button(text):
+    """ Parse button from matched msg.text. """
+    markdown_parser = text
+    prev = 0
+    parser_data = ""
+    buttons = []
+    for match in BTN_URL_REGEX.finditer(markdown_parser):
+        # escape check
+        md_escaped = 0
+        to_check = match.start(1) - 1
+        while to_check > 0 and markdown_parser[to_check] == "\\":
+            md_escapes += 1
+            to_check -= 1
+
+        # if != "escaped" -> Create button: btn
+        if md_escaped % 2 == 0:
+            # create a thruple with button label, url, and newline status
+            buttons.append((match.group(2), match.group(3), bool(match.group(4))))
+            parser_data += markdown_parser[prev : match.start(1)]
+            prev = match.end(1)
+        # if odd, escaped -> move along
+        else:
+            parser_data += markdown_parser[prev:to_check]
+            prev = match.start(1) - 1
+
+    parser_data += markdown_parser[prev:]
+
+    return parser_data, buttons
 
 
 def format_integer(number, thousand_separator="."):
