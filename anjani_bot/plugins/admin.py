@@ -17,7 +17,12 @@
 import asyncio
 from typing import ClassVar
 
-from pyrogram.errors import UserAdminInvalid, FloodWait, ChatAdminRequired, UserIdInvalid
+from pyrogram.errors import (
+    ChatAdminRequired,
+    FloodWait,
+    UserAdminInvalid,
+    UserIdInvalid,
+)
 
 from anjani_bot import listener, plugin
 from anjani_bot.utils import adminlist, extract_user_and_text
@@ -29,7 +34,7 @@ class Admin(plugin.Plugin):
 
     @listener.on("pin", can_pin=True)
     async def pin(self, message):
-        """ Pin message on chats """
+        """Pin message on chats"""
         if message.reply_to_message is None:
             return await message.reply(
                 await self.bot.text(message.chat.id, "error-reply-to-message")
@@ -45,7 +50,7 @@ class Admin(plugin.Plugin):
 
     @listener.on("unpin", can_pin=True)
     async def unpin(self, message):
-        """ Unpin message on chats """
+        """Unpin message on chats"""
         chat_id = message.chat.id
         chat = await self.bot.client.get_chat(chat_id)
         if message.command and message.command[0] == "all":
@@ -58,17 +63,19 @@ class Admin(plugin.Plugin):
 
     @listener.on("setgpic", can_change_info=True)
     async def change_g_pic(self, message):
-        """ Set group picture """
+        """Set group picture"""
         msg = message.reply_to_message or message
         file = msg.photo or None
         if file:
             await self.bot.client.set_chat_photo(message.chat.id, photo=file.file_id)
         else:
-            await message.reply_text(await self.bot.text(message.chat.id, "gpic-no-photo"))
+            await message.reply_text(
+                await self.bot.text(message.chat.id, "gpic-no-photo")
+            )
 
     @listener.on("adminlist")
     async def admin_list(self, message):
-        """ Get list of chat admins """
+        """Get list of chat admins"""
         if message.chat.type == "private":
             return await message.reply_text(
                 await self.bot.text(message.chat.id, "error-chat-private")
@@ -81,7 +88,7 @@ class Admin(plugin.Plugin):
 
     @listener.on("zombies", can_restrict=True)
     async def zombie_clean(self, message):
-        """ Kick all deleted acc in group. """
+        """Kick all deleted acc in group."""
         chat_id = message.chat.id
         zombie = 0
 
@@ -102,14 +109,18 @@ class Admin(plugin.Plugin):
 
     @listener.on("promote", can_promote=True)
     async def promoter(self, message):
-        """ Bot promote member, required Both permission of can_promote"""
+        """Bot promote member, required Both permission of can_promote"""
         chat_id = message.chat.id
         user, _ = extract_user_and_text(message)
 
         if not user:
-            return await message.reply_text(await self.bot.text(chat_id, "no-promote-user"))
+            return await message.reply_text(
+                await self.bot.text(chat_id, "no-promote-user")
+            )
         if user == self.bot.identifier:
-            return await message.reply_text(await self.bot.text(chat_id, "error-its-myself"))
+            return await message.reply_text(
+                await self.bot.text(chat_id, "error-its-myself")
+            )
 
         # bot can't assign higher perms than itself!
         # bot_perm = await self.bot.client.get_chat_member(chat_id, "me")
@@ -127,21 +138,29 @@ class Admin(plugin.Plugin):
                 can_pin_messages=bot_perm.can_pin_messages,
             )
         except ChatAdminRequired:
-            return await message.reply_text(await self.bot.text(chat_id, "promote-error-perm"))
+            return await message.reply_text(
+                await self.bot.text(chat_id, "promote-error-perm")
+            )
         except UserIdInvalid:
-            return await message.reply_text(await self.bot.text(chat_id, "promote-error-invalid"))
+            return await message.reply_text(
+                await self.bot.text(chat_id, "promote-error-invalid")
+            )
         await message.reply_text(await self.bot.text(chat_id, "promote-success"))
 
     @listener.on("demote", can_promote=True)
     async def demoter(self, message):
-        """ Demoter Just owner and promoter can demote admin."""
+        """Demoter Just owner and promoter can demote admin."""
         chat_id = message.chat.id
         user, _ = extract_user_and_text(message)
 
         if not user:
-            return await message.reply_text(await self.bot.text(chat_id, "no-demote-user"))
+            return await message.reply_text(
+                await self.bot.text(chat_id, "no-demote-user")
+            )
         if user == self.bot.identifier:
-            return await message.reply_text(await self.bot.text(chat_id, "error-its-myself"))
+            return await message.reply_text(
+                await self.bot.text(chat_id, "error-its-myself")
+            )
 
         try:
             await message.chat.promote_member(
@@ -156,5 +175,7 @@ class Admin(plugin.Plugin):
                 can_pin_messages=False,
             )
         except ChatAdminRequired:
-            return await message.reply_text(await self.bot.text(chat_id, "demote-error-perm"))
+            return await message.reply_text(
+                await self.bot.text(chat_id, "demote-error-perm")
+            )
         await message.reply_text(await self.bot.text(chat_id, "demote-success"))

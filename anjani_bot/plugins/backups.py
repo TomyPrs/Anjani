@@ -51,7 +51,8 @@ class Backups(plugin.Plugin):
             message.reply_document(
                 file_name,
                 caption=await self.bot.text(
-                    chat_id, "backup-doc", chat_name, chat_id, date, saved)
+                    chat_id, "backup-doc", chat_name, chat_id, date, saved
+                ),
             ),
             msg.delete(),
             self.bot.channel_log(
@@ -60,7 +61,7 @@ class Backups(plugin.Plugin):
                 f"Chat ID: `{chat_id}`\n"
                 f"Time: `{date}`\n\n"
                 f"**Backed-up Data:** {saved}"
-            )
+            ),
         )
         os.remove(file_name)
 
@@ -73,23 +74,19 @@ class Backups(plugin.Plugin):
                 await self.bot.text(chat_id, "no-backup-file")
             )
         msg = await message.reply_text(await self.bot.text(chat_id, "restore-progress"))
-        data = await message.reply_to_message.download(self.bot.get_config.download_path)
+        data = await message.reply_to_message.download(
+            self.bot.get_config.download_path
+        )
         with open(data, "r") as file:
             text = file.read()
         parsed_data = json.loads(text)
         try:  # also check if the file isn't a valid backup file
             if parsed_data["chat_id"] != chat_id:
-                return await msg.edit(
-                    await self.bot.text(chat_id, "backup-id-invalid")
-                )
+                return await msg.edit(await self.bot.text(chat_id, "backup-id-invalid"))
         except KeyError:
-            return await msg.edit(
-                await self.bot.text(chat_id, "invalid-backup-file")
-            )
+            return await msg.edit(await self.bot.text(chat_id, "invalid-backup-file"))
         if len(parsed_data.keys()) == 1:
-            return await msg.edit(
-                await self.bot.text(chat_id, "backup-data-null")
-            )
+            return await msg.edit(await self.bot.text(chat_id, "backup-data-null"))
         await self.bot.backup_plugin_data(chat_id, parsed_data)
         await asyncio.gather(
             msg.edit(await self.bot.text(chat_id, "backup-done")),
@@ -97,6 +94,6 @@ class Backups(plugin.Plugin):
                 "**Successfully restored:**\n"
                 f"Chat: `{message.chat.title}`\n"
                 f"Chat ID: `{message.chat.id}`"
-            )
+            ),
         )
         os.remove(data)

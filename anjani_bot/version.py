@@ -16,4 +16,6 @@
 
 __version__ = "1.1.2"
 __license__ = "GNU General Public License v3.0 or later (GPLv3+)"
-__copyright__ = "Copyright (C) 2020 - 2021  UserbotIndo Team, <https://github.com/userbotindo.git>"
+__copyright__ = (
+    "Copyright (C) 2020 - 2021  UserbotIndo Team, <https://github.com/userbotindo.git>"
+)

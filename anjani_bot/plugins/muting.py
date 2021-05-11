@@ -14,9 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pyrogram.types import ChatPermissions
 from pyrogram.errors import (
-    UserAdminInvalid, UsernameNotOccupied, UsernameInvalid, PeerIdInvalid)
+    PeerIdInvalid,
+    UserAdminInvalid,
+    UsernameInvalid,
+    UsernameNotOccupied,
+)
+from pyrogram.types import ChatPermissions
 
 from anjani_bot import listener, plugin
 from anjani_bot.utils import (
@@ -24,7 +28,7 @@ from anjani_bot.utils import (
     extract_time,
     extract_user,
     extract_user_and_text,
-    user_ban_protected
+    user_ban_protected,
 )
 
 
@@ -33,7 +37,7 @@ class Muting(plugin.Plugin):
     helpable = True
 
     async def parse_member(self, user_ids) -> ParsedChatMember:
-        """ Get member atrribute """
+        """Get member atrribute"""
         member = await extract_user(self.bot.client, user_ids)
         return ParsedChatMember(member)
 
@@ -42,9 +46,7 @@ class Muting(plugin.Plugin):
         try:
             member = await message.chat.get_member(user_id)
             if member.can_send_messages is False and time == 0:
-                await message.reply_text(
-                    await self.bot.text(chat_id, "already-muted")
-                )
+                await message.reply_text(await self.bot.text(chat_id, "already-muted"))
                 return False
             await self.bot.client.restrict_chat_member(
                 chat_id, user_id, ChatPermissions(), time
@@ -56,14 +58,12 @@ class Muting(plugin.Plugin):
             )
             return False
         except UserAdminInvalid:
-            await message.reply_text(
-                await self.bot.text(chat_id, "cant-mute-admin")
-            )
+            await message.reply_text(await self.bot.text(chat_id, "cant-mute-admin"))
             return False
 
     @listener.on("mute", can_restrict=True)
     async def mute(self, message):
-        """ Mute chat member """
+        """Mute chat member"""
         chat_id = message.chat.id
         user_id, res = extract_user_and_text(message)
         if not user_id:
@@ -71,9 +71,7 @@ class Muting(plugin.Plugin):
                 await self.bot.text(chat_id, "no-mute-user")
             )
         if user_id in [self.bot.identifier, f"@{self.bot.username}"]:
-            return await message.reply_text(
-                await self.bot.text(chat_id, "self-muting")
-            )
+            return await message.reply_text(await self.bot.text(chat_id, "self-muting"))
         if await user_ban_protected(self.bot, chat_id, user_id):
             return await message.reply_text(
                 await self.bot.text(chat_id, "cant-mute-admin")
@@ -100,7 +98,7 @@ class Muting(plugin.Plugin):
 
     @listener.on("unmute", can_restrict=True)
     async def unmute(self, message):
-        """ Unmute chat member """
+        """Unmute chat member"""
         user, _ = extract_user_and_text(message)
         if user is None:
             return await message.reply_text(
