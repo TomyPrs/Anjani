@@ -29,10 +29,10 @@ ignore_labels:
 restylers_version: stable
 
 restylers:
-  - isort
+  - black
 
-  - yapf:
-      arguments: ["--style", "google"]
+  - isort:
+      arguments: ["--profile", "black"]
 
   - name: prettier
     include: ["**/*.md"]

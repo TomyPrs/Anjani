@@ -18,8 +18,8 @@ import asyncio
 import json
 import logging
 import time
-from typing import List, Optional
 from sys import version_info
+from typing import List, Optional
 
 import aiohttp
 import aiorun
@@ -36,7 +36,8 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Anjani(TelegramBot, DataBase, PluginExtender):
-    """ AnjaniBot Client """
+    """AnjaniBot Client"""
+
     client: pyrogram.Client
     http: aiohttp.ClientSession
     loop: asyncio.AbstractEventLoop
@@ -65,12 +66,10 @@ class Anjani(TelegramBot, DataBase, PluginExtender):
 
     @property
     def uptime(self) -> str:
-        """ Get bot uptime """
+        """Get bot uptime"""
         return get_readable_time(time.time() - self._start_time)
 
-    async def begin(
-            self,
-            loop: Optional[asyncio.AbstractEventLoop] = None) -> "Anjani":
+    async def begin(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> "Anjani":
         """Start AnjaniBot"""
         if loop:
             asyncio.set_event_loop(loop)
@@ -90,7 +89,7 @@ class Anjani(TelegramBot, DataBase, PluginExtender):
                 self.loop.stop()
 
     async def stop(self) -> None:
-        """ Stop client """
+        """Stop client"""
         LOGGER.info("Disconnecting...")
 
         self.stopping = True

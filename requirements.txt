@@ -10,4 +10,3 @@ PyYAML
 spamwatch
 tgcrypto
 uvloop
-
