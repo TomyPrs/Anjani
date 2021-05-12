@@ -89,6 +89,18 @@ invalid-backup-file: It seems that this file isn't a backup from me. I can't res
 no-backup-file: Reply to the backup file!
 restore-progress: Restoring data...
 #endregion
+#region federations
+federations-button: Federations
+# federations-help: |
+#   Ah, group management. It's all fun and games, until you start getting spammers in, and you need to ban them. Then you need to start banning more, and more, and it gets painful.
+#   But then you have multiple groups, and you don't want these spammers in any of your groups - how can you deal? Do you have to ban them manually, in all your groups?
+
+#   No more! With federations, you can make a ban in one chat overlap to all your other chats.
+#   You can even appoint federation admins, so that your trustworthiest admins can ban across all the chats that you want to protect.
+
+#   **Commands available:
+#   × /newfed <name>: Create a new federation with the specified name.
+#endregion
 #region language
 language-button: Language
 language-help: |
@@ -170,7 +182,7 @@ notes-help: |
   \nCheck /markdownhelp for more notes formatting info.
 notes-invalid-args : |
   Reply to a message with text or provide text after notes name.
-  E.g.: /save <notename> <msg/reply to msg> 
+  E.g.: /save <notename> <msg/reply to msg>
 note-saved: "Notes saved as `{}`."
 note-list: "**Note List in {}:**\n"
 no-notes: "`No notes saved in this chat!`"
