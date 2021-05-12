@@ -32,6 +32,7 @@ class RawGreeting(MessageParser):
 
     async def __on_load__(self):
         self.welcome_db = self.bot.get_collection("WELCOME")
+        self.goodbye_db = self.bot.get_collection("GOODBYE")
         self.lock = asyncio.Lock()
 
     async def __migrate__(self, old_chat, new_chat):
@@ -56,6 +57,10 @@ class RawGreeting(MessageParser):
         """Bot default welcome"""
         return await self.bot.text(chat_id, "default-welcome", noformat=True)
 
+    async def default_gdbye(self, chat_id):
+        """ Bot default say goodbye message. """
+        return await self.bot.text(chat_id, "default_goodbye", noformat=True)
+
     @staticmethod
     async def parse_user(user) -> ParsedChatMember:
         """Get user attribute"""
@@ -69,10 +74,21 @@ class RawGreeting(MessageParser):
         clean_serv = await self.clean_service(chat_id)
         return sett, text, clean_serv, button
 
+    async def full_goodbye(self, chat_id) -> Tuple[bool, str, bool]:
+        """ Get chat full goodbye data. """
+        sett = await self.gdbye_pref(chat_id)
+        text = await self.gdbye_msg(chat_id)
+        return sett, text
+
     async def welc_pref(self, chat_id) -> bool:
         """Get chat welcome setting"""
         setting = await self.welcome_db.find_one({"chat_id": chat_id})
         return setting.get("should_welcome", True) if setting else True
+
+   async def gdbye_pref(self, chat_id) -> bool:
+       """ Get chat goodbye  setting """
+       setting = await self.goodbye_db.find_one({"chat_id": chat_id})
+       return = setting.get("should_goodbye", True) if setting else True
 
     async def welc_msg(self, chat_id) -> str:
         """Get chat welcome string"""
@@ -80,6 +96,12 @@ class RawGreeting(MessageParser):
         if message := data.get("custom_welcome"):
             return message, data.get("button")
         return await self.default_welc(chat_id), None
+
+    async def gdbye_msg(self, chat_id) -> str:
+        """ Get chat welcome string. """
+        data = await self.goodbye_db.find_one({"chat_id": chat_id})
+        if data.get("custom_goodbye"):
+            return await self.default_gdbye(chat_id), None
 
     async def clean_service(self, chat_id) -> bool:
         """Fetch clean service setting"""
