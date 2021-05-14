@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, Sequence
 
 from pyrogram.types import Message, User
 
@@ -51,6 +51,38 @@ class ParsedChatMember:
     async def get_members(self, client, chat_id):
         """Count chat member"""
         self.count = await client.get_chat_members_count(chat_id)
+
+
+class GetChatLock:
+    def chat_lock(self, message: Message, lock_type: str, should_lock: bool) -> Sequence[str]:
+        self.lock = not should_lock
+        chat_perm = message.chat.permissions
+        self.message = chat_perm.can_send_messages
+        self.media = chat_perm.can_send_media_messages
+        self.stickers = chat_perm.can_send_stickers
+        self.animations = chat_perm.can_send_animations
+        self.games = chat_perm.can_send_games
+        self.inlinebots = chat_perm.can_use_inline_bots
+        self.wpprev = chat_perm.can_add_web_page_previews
+        self.polls = chat_perm.can_send_polls
+        self.info = chat_perm.can_change_info
+        self.invite = chat_perm.can_invite_users
+        self.pin = chat_perm.can_pin_messages
+        self.perm = None
+        return (
+            message,
+            media,
+            stickers,
+            animations,
+            games,
+            inlinebots,
+            wepprev,
+            polls,
+            info,
+            invite,
+            pin,
+            perm,
+        )
 
 
 def extract_user_and_text(message: Message) -> Tuple[Union[str, int], Optional[str]]:
